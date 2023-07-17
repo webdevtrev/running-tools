@@ -1,26 +1,27 @@
 'use client';
-import React, { useEffect, useState, useReducer } from 'react';
+import React, { useEffect, useRef, useReducer } from 'react';
 import styles from './page.module.css';
 import Button from '@/Components/Button';
 
-const initialState = {
-  active: true,
-  time: 0,
-  running: false,
-  distance: 5000,
-  split: 1600,
-  runners: [{ name: 'Trevor Cash', splits: [] }],
-  activeRunner: 0,
-};
+let time = 0;
 // const initialState = {
-//   active: false,
+//   active: true,
 //   time: 0,
 //   running: false,
-//   distance: undefined,
-//   split: undefined,
-//   runners: [{ name: '', splits: [] }],
+//   distance: 5000,
+//   split: 1600,
+//   runners: [{ name: 'Trevor Cash', splits: [] }],
 //   activeRunner: 0,
 // };
+const initialState = {
+  active: false,
+  time: 0,
+  running: false,
+  distance: undefined,
+  split: undefined,
+  runners: [{ name: '', splits: [] }],
+  activeRunner: 0,
+};
 function reducer(state, action) {
   const runners = state.runners;
   switch (action.type) {
@@ -29,9 +30,10 @@ function reducer(state, action) {
     case 'updateTime':
       return { ...state, time: action.time };
     case 'reset':
+      time = 0;
+      action.timer.textContent = '00:00.00';
       return {
         ...state,
-        time: 0,
         runners: state.runners.map((runner, index) => {
           return { ...runner, splits: [] };
         }),
@@ -47,7 +49,7 @@ function reducer(state, action) {
         runners: runners,
       };
     case 'addRunnerSplit':
-      runners[state.activeRunner].splits.push(state.time);
+      runners[state.activeRunner].splits.push(time);
       return {
         ...state,
         runners: runners,
@@ -89,14 +91,16 @@ function reducer(state, action) {
 }
 
 export default function Stopwatch() {
+  const timeContainer = useRef(null);
   const [state, dispatch] = useReducer(reducer, initialState);
   useEffect(() => {
     if (state.running) {
       const start = Date.now();
-      const current = state.time;
+      const current = time;
       const timer = setInterval(() => {
-        dispatch({ type: 'updateTime', time: Date.now() - start + current });
-      }, 100);
+        time = Date.now() - start + current;
+        timeContainer.current.innerHTML = formatTime(time);
+      }, 10);
       return () => {
         clearInterval(timer);
       };
@@ -107,7 +111,10 @@ export default function Stopwatch() {
     const minutes = Math.floor(time / 60000);
     const seconds = Math.floor((time - minutes * 60000) / 1000);
     const milliseconds = Math.floor(time - minutes * 60000 - seconds * 1000);
-    return `${padZero(minutes)}:${padZero(seconds)}.${padZero(milliseconds)}`;
+    const millisecondsWithoutThousands = Math.floor(milliseconds / 10);
+    return `${padZero(minutes)}:${padZero(seconds)}.${padZero(
+      millisecondsWithoutThousands
+    )}`;
   }
 
   function padZero(number) {
@@ -215,7 +222,9 @@ export default function Stopwatch() {
               </button>
             ))}
           </div>
-          <div className={styles.timer}>{formatTime(state.time)}</div>
+          <div ref={timeContainer} className={styles.timer}>
+            {formatTime(time)}
+          </div>
           <div className={styles.timingButtons}>
             <button
               className={`${styles.timingButton} ${
@@ -233,6 +242,13 @@ export default function Stopwatch() {
                 onClick={() => {
                   dispatch({ type: 'addRunnerSplit' });
                 }}
+                style={{
+                  visibility:
+                    state.runners[state.activeRunner].splits.length ===
+                    Math.floor(state.distance / state.split)
+                      ? 'hidden'
+                      : 'visible',
+                }}
               >
                 Lap
               </button>
@@ -243,7 +259,7 @@ export default function Stopwatch() {
                   if (
                     window.confirm("Resetting will clear all runner's times.")
                   ) {
-                    dispatch({ type: 'reset' });
+                    dispatch({ type: 'reset', timer: timeContainer.current });
                   }
                 }}
               >
