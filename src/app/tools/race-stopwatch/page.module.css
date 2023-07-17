@@ -1,7 +1,102 @@
-.settings {
+.wrapper > * {
   display: flex;
   flex-direction: column;
+  gap: 1rem;
+}
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+.form input {
+  padding: 0.5rem;
+}
+.label {
+  display: flex;
+  flex-direction: row;
   align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+.label input {
+  flex: 1;
+}
+.labelText {
+  width: 100%;
+}
+.runnerInputs {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+.runnerInput {
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  gap: 0.5rem;
+}
+.runnerInput input {
+  flex: 1;
+}
+.runnerButtons {
+  display: flex;
+  gap: 1rem;
+  width: 100%;
+  overflow-x: scroll;
+  padding: 1rem 0;
+}
+.runnerButton {
+  background-color: transparent;
+  border: 2px solid black;
+  cursor: pointer;
+  width: max-content;
+  flex-shrink: 0;
+  padding: 0.5rem 0.25rem;
+}
+.activeRunner {
+  background-color: #e6e6e6;
+}
+.timer {
+  position: relative;
+  left: calc((216px - 192px) / 2);
+  font-size: 40px;
+  display: inline-block;
+  width: 216px;
+  margin: auto;
+  font-family: 'Courier New', Courier, monospace;
+}
+.timingButtons {
+  display: flex;
+  flex-direction: row;
   justify-content: center;
-  height: 100%;
+  gap: 10%;
+  padding: 0 10%;
+}
+.timingButton {
+  flex: 1;
+  aspect-ratio: 1/1;
+  border-radius: 50%;
+  border: 3px solid black;
+  cursor: pointer;
+  max-width: 100px;
+  font-size: clamp(1rem, 6vw, 2rem);
+}
+.stop {
+  background-color: red;
+}
+.start {
+  background-color: #84cf13;
+}
+.lapButton {
+}
+.estimate {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  text-align: center;
+  font-size: 18px;
+  padding: 0 10%;
+}
+.table {
+  text-align: center;
 }

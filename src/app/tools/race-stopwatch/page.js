@@ -1,25 +1,26 @@
 'use client';
 import React, { useEffect, useState, useReducer } from 'react';
 import styles from './page.module.css';
+import Button from '@/Components/Button';
 
-// const initialState = {
-//   active: true,
-//   time: 0,
-//   running: false,
-//   distance: 5000,
-//   split: 1600,
-//   runners: [{ name: 'Trevor Cash', splits: [] }],
-//   activeRunner: 0,
-// };
 const initialState = {
-  active: false,
+  active: true,
   time: 0,
   running: false,
-  distance: undefined,
-  split: undefined,
-  runners: [{ name: '', splits: [] }],
+  distance: 5000,
+  split: 1600,
+  runners: [{ name: 'Trevor Cash', splits: [] }],
   activeRunner: 0,
 };
+// const initialState = {
+//   active: false,
+//   time: 0,
+//   running: false,
+//   distance: undefined,
+//   split: undefined,
+//   runners: [{ name: '', splits: [] }],
+//   activeRunner: 0,
+// };
 function reducer(state, action) {
   const runners = state.runners;
   switch (action.type) {
@@ -114,18 +115,19 @@ export default function Stopwatch() {
   }
 
   return (
-    <div>
+    <div className={styles.wrapper}>
       {!state.active ? (
         <form
-          className={styles.settings}
+          className={styles.form}
           onSubmit={(e) => {
             e.preventDefault();
             dispatch({ type: 'toggleActive' });
           }}
         >
-          <label>
-            Distance
+          <label className={styles.label}>
+            <span className={styles.labelText}>Distance</span>
             <input
+              className={styles.input}
               type='number'
               placeholder='5000'
               required
@@ -134,11 +136,12 @@ export default function Stopwatch() {
                 dispatch({ type: 'setDistance', distance: e.target.value });
               }}
             />
-            meters
+            <span>meters</span>
           </label>
-          <label>
-            Splits
+          <label className={styles.label}>
+            <span className={styles.labelText}>Splits</span>
             <input
+              className={styles.input}
               type='number'
               placeholder='1600'
               required
@@ -147,12 +150,14 @@ export default function Stopwatch() {
                 dispatch({ type: 'setSplit', split: e.target.value });
               }}
             />
-            meters
+            <span>meters</span>
           </label>
-          <div>
+          <div className={styles.runnerInputs}>
+            <span>Add Runners</span>
             {state.runners?.map((runner, index) => (
-              <div key={index}>
+              <div className={styles.runnerInput} key={index}>
                 <input
+                  className={styles.input}
                   type='text'
                   placeholder='Runner Name'
                   value={runner.name}
@@ -166,77 +171,87 @@ export default function Stopwatch() {
                   }}
                 />
                 {state.runners.length > 1 && (
-                  <button
+                  <Button
                     onClick={() => {
                       dispatch({ type: 'removeRunner', index: index });
                     }}
                   >
                     Remove
-                  </button>
+                  </Button>
                 )}
               </div>
             ))}
-            <button
+            <Button
               onClick={() => {
                 dispatch({ type: 'addRunner' });
               }}
             >
               Add Runner
-            </button>
+            </Button>
           </div>
-          <button submit>Begin</button>
+          <Button submit>Begin</Button>
         </form>
       ) : (
         <div>
-          <button
+          <Button
             onClick={() => {
               dispatch({ type: 'toggleActive' });
             }}
           >
             Edit Settings
-          </button>
-          <div>
+          </Button>
+          <div className={styles.runnerButtons}>
             {state.runners?.map((runner, index) => (
               <button
                 key={index}
                 onClick={() => {
                   dispatch({ type: 'setActiveRunner', index: index });
                 }}
+                className={`${styles.runnerButton} ${
+                  index === state.activeRunner && styles.activeRunner
+                }`}
               >
                 {runner.name}
               </button>
             ))}
           </div>
-          <div>{formatTime(state.time)}</div>
-          <button
-            onClick={() => {
-              dispatch({ type: 'toggleRunning' });
-            }}
-          >
-            {state.running ? 'Stop' : 'Start'}
-          </button>
-          {state.running ? (
+          <div className={styles.timer}>{formatTime(state.time)}</div>
+          <div className={styles.timingButtons}>
             <button
+              className={`${styles.timingButton} ${
+                state.running ? styles.stop : styles.start
+              }`}
               onClick={() => {
-                dispatch({ type: 'addRunnerSplit' });
+                dispatch({ type: 'toggleRunning' });
               }}
             >
-              Lap
+              {state.running ? 'Stop' : 'Start'}
             </button>
-          ) : (
-            <button
-              onClick={() => {
-                if (
-                  window.confirm("Resetting will clear all runner's times.")
-                ) {
-                  dispatch({ type: 'reset' });
-                }
-              }}
-            >
-              Reset
-            </button>
-          )}
-          <div>
+            {state.running ? (
+              <button
+                className={`${styles.timingButton} ${styles.lapButton}`}
+                onClick={() => {
+                  dispatch({ type: 'addRunnerSplit' });
+                }}
+              >
+                Lap
+              </button>
+            ) : (
+              <button
+                className={`${styles.timingButton} ${styles.lapButton}`}
+                onClick={() => {
+                  if (
+                    window.confirm("Resetting will clear all runner's times.")
+                  ) {
+                    dispatch({ type: 'reset' });
+                  }
+                }}
+              >
+                Reset
+              </button>
+            )}
+          </div>
+          <div className={styles.estimate}>
             <div>Current {state.distance}m estimate:</div>
             <div>
               {state.runners[state.activeRunner].splits.length
@@ -250,12 +265,12 @@ export default function Stopwatch() {
                 : '--:--.--'}
             </div>
           </div>
-          <table>
+          <table className={styles.table}>
             <tbody>
               <tr>
                 <th>Lap</th>
                 <th>Distance</th>
-                <th>Lap Time</th>
+                <th>Split</th>
                 <th>Total Time</th>
               </tr>
             </tbody>
@@ -276,7 +291,11 @@ export default function Stopwatch() {
                         {' '}
                         {runnerSplit ? formatTime(runnerSplit) : '--:--.--'}
                       </td>
+
                       <button
+                        style={{
+                          visibility: !!runnerSplit ? 'visible' : 'hidden',
+                        }}
                         onClick={() => {
                           dispatch({ type: 'clearSplit', index: index });
                         }}
