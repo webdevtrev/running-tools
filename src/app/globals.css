@@ -1,7 +1,12 @@
 html,
 body {
   margin: 0;
+  padding: 0.5rem;
 }
 * {
   color: black;
+}
+main {
+  max-width: 600px;
+  margin: auto;
 }
