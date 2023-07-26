@@ -300,7 +300,7 @@ export default function Stopwatch() {
                 return (
                   <tbody key={index}>
                     <tr>
-                      <td>{index}</td>
+                      <td>{index + 1}</td>
                       <td>{state.split * (index + 1)}m</td>
                       <td>{runnerSplit ? formatTime(lapTime) : '--:--.--'}</td>
                       <td>
