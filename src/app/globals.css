@@ -1,12 +1,36 @@
+:root {
+  --background: #1e212b;
+  --color: #ffffff;
+  --border: #808a9f;
+}
 html,
 body {
   margin: 0;
   padding: 0.5rem;
-}
-* {
-  color: black;
+  background-color: var(--background);
+  color: var(--color);
 }
 main {
   max-width: 600px;
   margin: auto;
+}
+button {
+  cursor: pointer;
+  background-color: transparent;
+  border: var(--border) 2px solid;
+  color: var(--color);
+  padding: 0.5rem;
+  border-radius: 0;
+}
+button:hover {
+  background-color: var(--border);
+}
+input,
+select {
+  padding: 0.5rem;
+  appearance: none;
+  border-radius: 0;
+  background-color: transparent;
+  color: var(--color);
+  border: var(--border) 2px solid;
 }

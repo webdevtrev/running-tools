@@ -2,7 +2,11 @@
 import React, { useEffect, useRef, useReducer } from 'react';
 import styles from './page.module.css';
 import Button from '@/Components/Button';
-
+const abbreviations = {
+  meters: 'm',
+  miles: 'mi',
+  kilometers: 'km',
+};
 let time = 0;
 // const initialState = {
 //   active: true,
@@ -19,6 +23,7 @@ const initialState = {
   running: false,
   distance: undefined,
   split: undefined,
+  unit: 'meters',
   runners: [{ name: '', splits: [] }],
   activeRunner: 0,
 };
@@ -85,6 +90,11 @@ function reducer(state, action) {
         active: !state.active,
         runners: runners.filter((runner) => !!runner.name.length),
       };
+    case 'setUnit':
+      return {
+        ...state,
+        unit: action.unit,
+      };
     default:
       throw new Error();
   }
@@ -99,7 +109,9 @@ export default function Stopwatch() {
       const current = time;
       const timer = setInterval(() => {
         time = Date.now() - start + current;
-        timeContainer.current.innerHTML = formatTime(time);
+        if (timeContainer.current) {
+          timeContainer.current.innerHTML = formatTime(time);
+        }
       }, 10);
       return () => {
         clearInterval(timer);
@@ -124,80 +136,97 @@ export default function Stopwatch() {
   return (
     <div className={styles.wrapper}>
       {!state.active ? (
-        <form
-          className={styles.form}
-          onSubmit={(e) => {
-            e.preventDefault();
-            dispatch({ type: 'toggleActive' });
-          }}
-        >
-          <label className={styles.label}>
-            <span className={styles.labelText}>Distance</span>
-            <input
-              className={styles.input}
-              type='number'
-              placeholder='5000'
-              required
-              value={state.distance}
-              onChange={(e) => {
-                dispatch({ type: 'setDistance', distance: e.target.value });
-              }}
-            />
-            <span>meters</span>
-          </label>
-          <label className={styles.label}>
-            <span className={styles.labelText}>Splits</span>
-            <input
-              className={styles.input}
-              type='number'
-              placeholder='1600'
-              required
-              value={state.split}
-              onChange={(e) => {
-                dispatch({ type: 'setSplit', split: e.target.value });
-              }}
-            />
-            <span>meters</span>
-          </label>
-          <div className={styles.runnerInputs}>
-            <span>Add Runners</span>
-            {state.runners?.map((runner, index) => (
-              <div className={styles.runnerInput} key={index}>
-                <input
-                  className={styles.input}
-                  type='text'
-                  placeholder='Runner Name'
-                  value={runner.name}
-                  required
-                  onChange={(e) => {
-                    dispatch({
-                      type: 'editRunner',
-                      runner: { name: e.target.value },
-                      index: index,
-                    });
-                  }}
-                />
-                {state.runners.length > 1 && (
-                  <Button
-                    onClick={() => {
-                      dispatch({ type: 'removeRunner', index: index });
+        <>
+          <h1>Race Stopwatch</h1>
+          <form
+            className={styles.form}
+            onSubmit={(e) => {
+              e.preventDefault();
+              dispatch({ type: 'toggleActive' });
+            }}
+          >
+            <label className={styles.label}>
+              <span className={styles.labelText}>Distance</span>
+              <input
+                className={styles.input}
+                type='number'
+                placeholder='5000'
+                required
+                value={state.distance}
+                onChange={(e) => {
+                  dispatch({ type: 'setDistance', distance: e.target.value });
+                }}
+              />
+              <span>{state.unit}</span>
+            </label>
+            <label className={styles.label}>
+              <span className={styles.labelText}>Splits</span>
+              <input
+                className={styles.input}
+                type='number'
+                placeholder='1600'
+                required
+                value={state.split}
+                onChange={(e) => {
+                  dispatch({ type: 'setSplit', split: e.target.value });
+                }}
+              />
+              <span>{state.unit}</span>
+            </label>
+            <label className={styles.label}>
+              <span className={styles.labelText}>Unit</span>
+              <select
+                onChange={(e) => {
+                  dispatch({ type: 'setUnit', unit: e.target.value });
+                }}
+                value={state.unit}
+              >
+                <option value='meters'>Meters</option>
+                <option value='miles'>Miles</option>
+              </select>
+            </label>
+            <div className={styles.runnerInputs}>
+              <span>Add Runners</span>
+              {state.runners?.map((runner, index) => (
+                <div className={styles.runnerInput} key={index}>
+                  <input
+                    className={styles.input}
+                    type='text'
+                    placeholder='Runner Name'
+                    value={runner.name}
+                    required
+                    onChange={(e) => {
+                      dispatch({
+                        type: 'editRunner',
+                        runner: { name: e.target.value },
+                        index: index,
+                      });
                     }}
-                  >
-                    Remove
-                  </Button>
-                )}
-              </div>
-            ))}
-            <Button
-              onClick={() => {
-                dispatch({ type: 'addRunner' });
-              }}
-            >
-              Add Runner
-            </Button>
-          </div>
-          <Button submit>Begin</Button>
-        </form>
+                  />
+                  {state.runners.length > 1 && (
+                    <Button
+                      onClick={() => {
+                        dispatch({ type: 'removeRunner', index: index });
+                      }}
+                    >
+                      Remove
+                    </Button>
+                  )}
+                </div>
+              ))}
+              <Button
+                type='button'
+                onClick={(e) => {
+                  e.preventDefault();
+                  dispatch({ type: 'addRunner' });
+                }}
+              >
+                Add Runner
+              </Button>
+            </div>
+            <Button submit>Begin</Button>
+          </form>
+        </>
       ) : (
         <div>
           <Button
@@ -268,7 +297,10 @@ export default function Stopwatch() {
             )}
           </div>
           <div className={styles.estimate}>
-            <div>Current {state.distance}m estimate:</div>
+            <div>
+              Current {state.distance}
+              {abbreviations[state.unit]} estimate:
+            </div>
             <div>
               {state.runners[state.activeRunner].splits.length
                 ? formatTime(
@@ -301,7 +333,9 @@ export default function Stopwatch() {
                   <tbody key={index}>
                     <tr>
                       <td>{index + 1}</td>
-                      <td>{state.split * (index + 1)}m</td>
+                      <td>
+                        {state.split * (index + 1)} {abbreviations[state.unit]}
+                      </td>
                       <td>{runnerSplit ? formatTime(lapTime) : '--:--.--'}</td>
                       <td>
                         {' '}
