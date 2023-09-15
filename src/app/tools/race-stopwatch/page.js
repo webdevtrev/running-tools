@@ -2,6 +2,7 @@
 import React, { useEffect, useRef, useReducer } from 'react';
 import styles from './page.module.css';
 import Button from '@/Components/Button';
+import { FaStopwatch } from 'react-icons/fa';
 const abbreviations = {
   meters: 'm',
   miles: 'mi',
@@ -137,7 +138,10 @@ export default function Stopwatch() {
     <div className={styles.wrapper}>
       {!state.active ? (
         <>
-          <h1>Race Stopwatch</h1>
+          <h1 className={styles.Heading}>
+            {' '}
+            <FaStopwatch /> Race Stopwatch
+          </h1>
           <form
             className={styles.form}
             onSubmit={(e) => {
@@ -182,6 +186,7 @@ export default function Stopwatch() {
                 value={state.unit}
               >
                 <option value='meters'>Meters</option>
+                <option value='kilometers'>Kilometers</option>
                 <option value='miles'>Miles</option>
               </select>
             </label>
