@@ -52,6 +52,11 @@ function reducer(state, action) {
     case 'setDistance':
       return { ...state, distance: action.distance };
     case 'setSplit':
+      window.gtag &&
+        window.gtag('event', 'set_split', {
+          tool: 'Race Stopwatch',
+          event_category: 'timer',
+        });
       return { ...state, split: action.split };
     case 'clearSplit':
       window.gtag &&
@@ -296,7 +301,7 @@ export default function Stopwatch() {
               }`}
               onClick={() => {
                 window.gtag &&
-                  window.gtag('event', !state.running ? 'stop' : 'start', {
+                  window.gtag('event', state.running ? 'stop' : 'start', {
                     tool: 'Race Stopwatch',
                     event_category: 'timer',
                   });

@@ -6,9 +6,26 @@ import Script from 'next/script';
 const inter = Inter({ subsets: ['latin'] });
 
 export const metadata = {
-  title: 'Timing Tools for Runners',
+  title: 'Racing Stopwatch',
   description:
-    'A collection of tools for coaches, runners, and parents to help with training and racing.',
+    'A collection of tools for spectators to help with training and racing.',
+  openGraph: {
+    type: 'website',
+    locale: 'en_US',
+    url: 'https://timing-tools.netlify.app',
+    siteName: 'Timing Tools',
+    title: 'Racing Stopwatch',
+    description:
+      'A collection of tools for spectators to help with training and racing',
+    images: [
+      {
+        url: 'https://timing-tools.netlify.app/meta.png',
+        width: 1200,
+        height: 630,
+        alt: 'Racing Stopwatch',
+      },
+    ],
+  },
 };
 
 export default function RootLayout({ children }) {
