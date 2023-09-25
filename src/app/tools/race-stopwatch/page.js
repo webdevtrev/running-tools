@@ -36,6 +36,11 @@ function reducer(state, action) {
     case 'updateTime':
       return { ...state, time: action.time };
     case 'reset':
+      window.gtag &&
+        window.gtag('event', 'reset', {
+          tool: 'Race Stopwatch',
+          event_category: 'timer',
+        });
       time = 0;
       action.timer.textContent = '00:00.00';
       return {
@@ -49,18 +54,33 @@ function reducer(state, action) {
     case 'setSplit':
       return { ...state, split: action.split };
     case 'clearSplit':
+      window.gtag &&
+        window.gtag('event', 'clear_split', {
+          tool: 'Race Stopwatch',
+          event_category: 'timer',
+        });
       runners[state.activeRunner].splits.splice(action.index, 1);
       return {
         ...state,
         runners: runners,
       };
     case 'addRunnerSplit':
+      window.gtag &&
+        window.gtag('event', 'split', {
+          tool: 'Race Stopwatch',
+          event_category: 'timer',
+        });
       runners[state.activeRunner].splits.push(time);
       return {
         ...state,
         runners: runners,
       };
     case 'addRunner':
+      window.gtag &&
+        window.gtag('event', 'reset', {
+          tool: 'Race Stopwatch',
+          event_category: 'set_up',
+        });
       return {
         ...state,
         runners: [...state.runners, { name: '', splits: [] }],
@@ -81,6 +101,11 @@ function reducer(state, action) {
         }),
       };
     case 'setActiveRunner':
+      window.gtag &&
+        window.gtag('event', 'change_runner', {
+          tool: 'Race Stopwatch',
+          event_category: 'timer',
+        });
       return {
         ...state,
         activeRunner: action.index,
@@ -92,6 +117,11 @@ function reducer(state, action) {
         runners: runners.filter((runner) => !!runner.name.length),
       };
     case 'setUnit':
+      window.gtag &&
+        window.gtag('set', {
+          tool: 'Race Stopwatch',
+          unit: action.unit,
+        });
       return {
         ...state,
         unit: action.unit,
@@ -265,6 +295,11 @@ export default function Stopwatch() {
                 state.running ? styles.stop : styles.start
               }`}
               onClick={() => {
+                window.gtag &&
+                  window.gtag('event', !state.running ? 'stop' : 'start', {
+                    tool: 'Race Stopwatch',
+                    event_category: 'timer',
+                  });
                 dispatch({ type: 'toggleRunning' });
               }}
             >
